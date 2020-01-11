@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-// bootstrap
+// central stylesheet
 import './scss/main.scss';
+
+// bootstrap js
+import 'bootstrap/dist/js/bootstrap.min';
 
 // vue2filters
 import Vue2Filters from 'vue2-filters';

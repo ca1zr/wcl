@@ -3,7 +3,7 @@
         <!-- list -->
         <div class="col-xs-12 col-md-9 column column__cards">
             
-            <h1 class="display-4">Country list of the world</h1>
+            <h1 class="display-4">World Country List</h1>
             
             <p class="lead">
                 A full list of all {{ totalCountries() }} countries in the world with their specific details.
@@ -66,14 +66,19 @@
                     </div>
             
                     <div class="card-footer">
-                        <div class="row card-footer-geo">
-                            <div class="col">
-                                <strong>Lat/Lng:</strong> {{item.latlng[0]}}/{{item.latlng[1]}}
-                            </div>
-                        </div>
                         <div class="row card-footer-map">
                             <div class="col">
-                            
+    
+                                <button
+                                        type="button"
+                                        class="btn btn-block btn-outline-secondary"
+                                        data-toggle="modal"
+                                        :data-target="`.modal-${index}`"
+                                        v-on:click="setCurrentItem(item)"
+                                >
+                                    Show map
+                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -82,6 +87,58 @@
             </div>
             
         </div>
+    
+        <!-- begin: Modal -->
+        <div
+            :class="`modal fade modal-${index}`"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="country"
+            aria-hidden="true"
+            :key="index"
+            v-for="(item, index) in filteredList"
+        >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Map location of {{ item.name }}
+                        </h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body" v-if="iframeLoaded">
+                        !!WIP [insert map here]
+                        <!--<vue-friendly-iframe @load="iframeLoad" :src="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`" />-->
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <div class="d-flex align-items-center justify-content-between w-100">
+                            <div class="col-xs-12 col-sm-6">
+                                <vue-link
+                                    :to="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`"
+                                    :external="true"
+                                    :new-tab="true"
+                                >
+                                    Open map in external window
+                                </vue-link>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 d-flex justify-content-sm-end">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end: Modal -->
         
         <div class="col-xs-12 col-md-3 column column__settings">
             <div class="column__settings_block">
@@ -120,6 +177,11 @@
     
     export default {
         name: 'Countries',
+        components: {
+            // asynchronous components
+            VueLink: () => import('vue-link'),
+            //VueFriendlyIframe: () => import('vue-friendly-iframe'),
+        },
         data() {
             return {
                 countries: [],
@@ -133,15 +195,15 @@
                     'Oceania',
                     'Polar',
                 ],
+                currentItem: {},
+                iframeLoaded: false,
             };
         },
         mounted() {
             const apiURL = '/data/countries.json';
             axios.get(apiURL)
                 .then((response) => {
-                    setTimeout(() => {
-                        this.countries = response.data;
-                    });
+                    this.countries = response.data;
                 })
                 .catch(error => console.log(error));
         },
@@ -158,6 +220,14 @@
                     return country.name.toLowerCase().match(this.search.toLowerCase());
                 });
             },
+            setCurrentItem(item) {
+                this.currentItem = item
+            },
+            iframeLoad(e) {
+                if (e.timeStamp < 1000) {
+                    this.iframeLoaded = true;
+                }
+            }
         },
         computed: {
             filteredList() {
@@ -179,7 +249,7 @@
 </style>
 
 <style lang="scss" scoped>
-    @import '~bootstrap/scss/bootstrap-grid';
+    @import '~bootstrap/scss/bootstrap';
     
     .column {
         &__cards {
@@ -208,6 +278,15 @@
         .card {
             @include media-breakpoint-up(sm) {
                 flex: 1 0 33%;
+                transform: scale(1);
+                transition: border-color, box-shadow 0.125s ease;
+                
+                &:hover {
+                    box-shadow: 0 1px 3px darken($border-color, 15%);
+                    border-color: darken($border-color, 15%);
+                    transform: scale(1.0015);
+                    transition: border-color, box-shadow 0.2s ease;
+                }
             }
             @include media-breakpoint-up(xl) {
                 flex: 1 0 25%;
