@@ -121,15 +121,13 @@
 
 <script>
     import axios from "axios";
-    import OpenInNewIcon from 'vue-material-design-icons/OpenInNew.vue';
     
     export default {
         name: 'Countries',
         components: {
             // asynchronous components
             VueLink: () => import('vue-link'),
-            // icons
-            OpenInNewIcon
+            OpenInNewIcon: () => import('vue-material-design-icons/OpenInNew'),
         },
         data() {
             return {
