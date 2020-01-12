@@ -70,12 +70,12 @@
                             <div class="col">
     
                                 <vue-link
-                                        :to="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`"
-                                        :external="true"
-                                        :new-tab="true"
-                                        class="btn btn-block btn-outline-secondary"
+                                    :to="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`"
+                                    :external="true"
+                                    :new-tab="true"
+                                    class="btn btn-block btn-outline-secondary"
                                 >
-                                    Show country on the map
+                                    <OpenInNewIcon /> Open map
                                 </vue-link>
 
                             </div>
@@ -121,12 +121,15 @@
 
 <script>
     import axios from "axios";
+    import OpenInNewIcon from 'vue-material-design-icons/OpenInNew.vue';
     
     export default {
         name: 'Countries',
         components: {
             // asynchronous components
             VueLink: () => import('vue-link'),
+            // icons
+            OpenInNewIcon
         },
         data() {
             return {
@@ -145,7 +148,7 @@
             };
         },
         mounted() {
-            const apiURL = '/data/countries.json';
+            const apiURL = '/data/countries.json'; // @see https://restcountries.eu/rest/v2/all
             axios.get(apiURL)
                 .then((response) => {
                     this.countries = response.data;
@@ -186,6 +189,7 @@
 </style>
 
 <style lang="scss" scoped>
+    @import '~vue-material-design-icons/styles.css';
     @import '~bootstrap/scss/bootstrap-grid';
     
     .column {
