@@ -3,9 +3,9 @@
         <!-- list -->
         <div class="col-xs-12 col-md-9 column column__cards">
             
-            <h1 class="display-4">World Country List</h1>
+            <h1 class="display-4 d-none d-md-block">World Country List</h1>
             
-            <p class="lead">
+            <p class="lead d-none d-md-block">
                 A full list of all {{ totalCountries() }} countries in the world with their specific details.
             </p>
             
@@ -69,15 +69,14 @@
                         <div class="row card-footer-map">
                             <div class="col">
     
-                                <button
-                                        type="button"
+                                <vue-link
+                                        :to="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`"
+                                        :external="true"
+                                        :new-tab="true"
                                         class="btn btn-block btn-outline-secondary"
-                                        data-toggle="modal"
-                                        :data-target="`.modal-${index}`"
-                                        v-on:click="setCurrentItem(item)"
                                 >
-                                    Show map
-                                </button>
+                                    Show country on the map
+                                </vue-link>
 
                             </div>
                         </div>
@@ -87,58 +86,6 @@
             </div>
             
         </div>
-    
-        <!-- begin: Modal -->
-        <div
-            :class="`modal fade modal-${index}`"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="country"
-            aria-hidden="true"
-            :key="index"
-            v-for="(item, index) in filteredList"
-        >
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            Map location of {{ item.name }}
-                        </h5>
-                        <button
-                            type="button"
-                            class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"
-                        >
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    
-                    <div class="modal-body" v-if="iframeLoaded">
-                        !!WIP [insert map here]
-                        <!--<vue-friendly-iframe @load="iframeLoad" :src="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`" />-->
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <div class="d-flex align-items-center justify-content-between w-100">
-                            <div class="col-xs-12 col-sm-6">
-                                <vue-link
-                                    :to="`https://www.openstreetmap.org/?mlat=${item.latlng[0]}&mlon=${item.latlng[1]}&zoom=5#map=5/${item.latlng[0]}/${item.latlng[1]}`"
-                                    :external="true"
-                                    :new-tab="true"
-                                >
-                                    Open map in external window
-                                </vue-link>
-                            </div>
-                            <div class="col-xs-12 col-sm-6 d-flex justify-content-sm-end">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- end: Modal -->
         
         <div class="col-xs-12 col-md-3 column column__settings">
             <div class="column__settings_block">
@@ -180,7 +127,6 @@
         components: {
             // asynchronous components
             VueLink: () => import('vue-link'),
-            //VueFriendlyIframe: () => import('vue-friendly-iframe'),
         },
         data() {
             return {
@@ -196,7 +142,6 @@
                     'Polar',
                 ],
                 currentItem: {},
-                iframeLoaded: false,
             };
         },
         mounted() {
@@ -220,14 +165,6 @@
                     return country.name.toLowerCase().match(this.search.toLowerCase());
                 });
             },
-            setCurrentItem(item) {
-                this.currentItem = item
-            },
-            iframeLoad(e) {
-                if (e.timeStamp < 1000) {
-                    this.iframeLoaded = true;
-                }
-            }
         },
         computed: {
             filteredList() {
@@ -249,7 +186,7 @@
 </style>
 
 <style lang="scss" scoped>
-    @import '~bootstrap/scss/bootstrap';
+    @import '~bootstrap/scss/bootstrap-grid';
     
     .column {
         &__cards {
